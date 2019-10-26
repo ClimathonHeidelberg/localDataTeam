@@ -30,8 +30,8 @@ def serial_date_to_date(srl_no):
         [type] -- [description]
     """
     new_date = np.datetime64('2006-01-01') + np.timedelta64(srl_no,'D')
-    year = new_date/np.timedelta64(1,'Y')
-    return new_date, year#.strftime("%Y-%m-%d")
+    #year = new_date/np.timedelta64(1,'Y')
+    return new_date#, year#.strftime("%Y-%m-%d")
 
 print(serial_date_to_date(1))
 print(np.array(time,dtype=int))
@@ -40,11 +40,14 @@ time2 = time.copy()
 time2 = np.array(time,dtype=datetime.date)
 year = np.array(time,dtype=datetime.date)
 
-year = time2/np.timedelta64(1,'Y')
+#year = time2/np.timedelta64(1,'Y')
 print(time2)
 for i in range(len(time)):
-    time2[i],year = serial_date_to_date(time[i])
-
+    time2[i] = serial_date_to_date(time[i])
+    year[i] = int(str(time2[0])[:4])
+print(time2[0])
+print(int(str(time2[0])[:4]))
+#assert 0
 #print(np.timedelta64(np.int32([2]), 'D'))
 print(type(time),type(time[0]))
 print(time2)
