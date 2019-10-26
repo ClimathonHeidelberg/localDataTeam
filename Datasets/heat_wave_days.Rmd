@@ -1,0 +1,34 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+max_temperature_data_mannheim <- read.csv("temperature.csv")
+
+#select days with minimum 33 degrees
+max_temp_data_filtered <- max_temperature_data_mannheim %>% 
+  subset(temperature >= 33) 
+
+max_temp_data_filtered$year <- 
+  max_temp_data_filtered$year %>% 
+  as.character()
+
+years <- c(1937:2018) %>%
+  as.character()
+  
+heatwave_days <- c()
+
+for (i in years){
+  no_heat_days <- grepl(i, max_temp_data_filtered$year) %>%
+    sum()
+  names(no_heat_days) <- i
+  heatwave_days <- c(heatwave_days, no_heat_days)
+  
+  
+  
+  
+}
+
+```
+
