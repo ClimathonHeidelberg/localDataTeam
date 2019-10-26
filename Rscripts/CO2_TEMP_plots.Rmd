@@ -1,0 +1,54 @@
+---
+title: "Exploratory analysis of useful datasets"
+author: "Junyan Lu"
+date: "10/26/2019"
+output: html_document
+---
+
+Load packages
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+
+# Historial CO2 data
+
+## Ice core
+
+### Read and format data
+```{r}
+dataTab <- read_xls("./Datasets/antarctica2015co2.xls", sheet = 4, col_names = FALSE)
+
+fillCell <- function(names) {
+  iniName <- names[1]
+  for (i in seq(length(names))) {
+    if (is.na(names[i])) names[i] <- iniName else iniName <- names[i]
+  }
+  return(names)
+}
+dataTab[1,] <- fillCell(unlist(dataTab[1,]))
+
+fullData <- lapply(seq(1, ncol(dataTab), by =3), function(i) {
+  eachTab <- dataTab[3:nrow(dataTab),i:(i+2)]
+  colnames(eachTab) <- c("depth","year","CO2")
+  eachTab$set <- dataTab[[i]][1]
+  eachTab
+}) %>% bind_rows() %>% filter(!is.na(CO2)) %>%
+  mutate(year = as.numeric(year), CO2 = as.numeric(CO2)) %>%
+  mutate(year = year + (2019-1950)) 
+```
+
+
+```{r}
+yearRange <- c(0, 200000, 400000, 600000, 800000)
+ggplot(fullData, aes(x=year, y=CO2)) + geom_point() + geom_line() +
+  scale_x_reverse(breaks = yearRange, labels = c("heute","vor\n200.000\nJahren","vor\n400.000\nJahren","vor\n 600.000\nJahren","vor\n800.000\nJahren")) + ylab("CO2-Konzentration") + xlab("") +
+  theme_bw()
+```
+
+
+```{r}
+
+```
+
