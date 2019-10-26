@@ -18,7 +18,7 @@ library(tidyverse)
 
 ### Read and format data
 ```{r}
-dataTab <- read_xls("./Datasets/antarctica2015co2.xls", sheet = 4, col_names = FALSE)
+dataTab <- read_xls("../Datasets/antarctica2015co2.xls", sheet = 4, col_names = FALSE)
 
 fillCell <- function(names) {
   iniName <- names[1]
@@ -29,7 +29,7 @@ fillCell <- function(names) {
 }
 dataTab[1,] <- fillCell(unlist(dataTab[1,]))
 
-fullData <- lapply(seq(1, ncol(dataTab), by =3), function(i) {
+co2Data <- lapply(seq(1, ncol(dataTab), by =3), function(i) {
   eachTab <- dataTab[3:nrow(dataTab),i:(i+2)]
   colnames(eachTab) <- c("depth","year","CO2")
   eachTab$set <- dataTab[[i]][1]
@@ -48,7 +48,22 @@ ggplot(fullData, aes(x=year, y=CO2)) + geom_point() + geom_line() +
 ```
 
 
-```{r}
+# Current CO2 data
 
+```{r}
+co2Today <- read_xlsx("../Datasets/annual_co2_data_ppm_hawaii.xlsx") %>%
+  mutate(CO2=as.numeric(mean)) %>%
+  select(year, CO2)
+```
+
+# Temperature
+```{r}
+tempTab <- read_csv("../Datasets/temperature.csv")
+ggplot(tempTab, aes(x=year, y = temperature)) + geom_point()+ geom_smooth()
+```
+
+# Save data for shinyApps
+```{r}
+save(co2Data, co2Today, file = "../shinyApp/data.RData")
 ```
 
