@@ -1,0 +1,32 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r importData}
+
+recent_data <- read_xls("/Users/reisenau/Climathon/API_EN.ATM.CO2E.KT_DS2_en_excel_v2_382761.xls")
+```
+```{r}
+recent_data_curated <- recent_data[4:nrow(recent_data), 5:ncol(recent_data)]
+colnames(recent_data_curated) <- recent_data[3, 5:ncol(recent_data)]
+recent_data_curated <- recent_data_curated %>%
+  t() %>%
+  type.convert() %>%
+  as.data.frame()
+
+
+
+means <- apply(recent_data_curated, 1, function (x){mean(x, na.rm=TRUE)})
+years <- rownames(recent_data_curated) %>% as.numeric()
+recent_data_curated <- cbind(recent_data_curated, means, years)
+
+ggplot(recent_data_curated, aes(x=years, y=means)) +
+  geom_point()
+```
+
