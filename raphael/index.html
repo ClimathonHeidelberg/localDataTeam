@@ -62,10 +62,10 @@
 
         var geoObject = JSON.parse(xmlHttp.responseText)
         var route_length = geoObject.features[0].properties.summary.distance;
-        var co2_car = route_length * 0.143 / 1000;
-        var co2_bus = route_length * 0.063 / 1000;
+        var co2_car = route_length * 0.143 / 1000; // source: https://www.delijn.be/de/overdelijn/organisatie/zorgzaam-ondernemen/milieu/co2-uitstoot-voertuigen.html
+        var co2_bus = route_length * 0.063 / 1000; // source: https://www.delijn.be/de/overdelijn/organisatie/zorgzaam-ondernemen/milieu/co2-uitstoot-voertuigen.html
         var amount = (co2_car - co2_bus).toFixed(3);;
-        var statement = route_length < 2000 ? "a little" : "a lot";
+        var statement = route_length < 3000 ? "a little" : "a lot";
         var statement2 = statement == "a little" ? "What about using your bike? CO2 Emission free!" : "Going by Bus could save " + amount + "kg CO2 emissions!";
         calculated_route = geoObject.features[0];
         route_layer = L.geoJSON().addTo(map);
