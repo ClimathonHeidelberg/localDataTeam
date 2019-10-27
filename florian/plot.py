@@ -86,12 +86,10 @@ def extract_years(time,tas):
 #print(np.array(time.timedelta64()))
 #print(serial_date_to_date(time.tolist()))
 #assert 0
-lon_s,lat_s,tas_s,time_s,year_s, year_numbers_s, tases_s, time2_s = [],[],[],[],[],[],[],[]
+_,_,tas_s,time_s,year_s, year_numbers_s, tases_s, time2_s = [],[],[],[],[],[],[],[]
 for i in range(len(names)):
     lon,lat,tas,time = extract(filename=filenames[i])
     year, year_numbers, tases, time2 = extract_years(time,tas)
-    lon_s.append(lon)
-    lat_s.append(lat)
     tas_s.append(tas)
     time_s.append(time)
     year_s.append(year)
@@ -102,18 +100,20 @@ for i in range(len(names)):
 weights = np.cos(np.deg2rad(lat))
 weights = weights/weights.sum()
 weights = weights[np.newaxis, :, None] * np.ones_like(tases)
+fig_trend = plt.figure(figsize=(10,5))
+ax1 = plt.subplot(1,1,1)
 
 def show_trends(i):
     #plt.figure(names[i])
 
     #plt.show(block=True)
 
-    ax.clear()
-    ax.set_title(names[i])
+    ax1.clear()
+    ax1.set_title(names[i])
 
-    ax.plot(year_numbers_s[i],tases_s[i][:,110,4],label = "Heidelberg")
+    ax1.plot(year_numbers_s[i],tases_s[i][:,110,4],label = "Heidelberg")
 
-    ax.plot(year_numbers_s[i],np.average(tases_s[i][:,:,:],weights=weights,axis=(1,2)),label="Global")
+    ax1.plot(year_numbers_s[i],np.average(tases_s[i][:,:,:],weights=weights,axis=(1,2)),label="Global")
     x = np.array(year_numbers_s[i], dtype='float')
     y = tases_s[i][:,110,4]
     A = np.vstack([x, np.ones(len(x))]).T
@@ -124,12 +124,12 @@ def show_trends(i):
     #global_fit=poly.polyfit(year_numbers, np.average(tases[:,:,:],weights=weights,axis=(1,2)),1)
     #hd_fit = poly.polyval(year_numbers, hd_fit)
     #global_fit = poly.polyval(year_numbers, global_fit)
-    ax.plot(x, m*x + c, 'r', label='Fitted line')
+    ax1.plot(x, m*x + c, 'r', label='Durchschnittlicher Verlauf')
     #plt.plot(year_numbers,hd_fit,label = "Heidelberg")
     #plt.plot(year_numbers,global_fit,label = "Global")
-    plt.legend()
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Average Temperature in °C")
+    fig_trend.legend()
+    ax1.set_xlabel("Year")
+    ax1.set_ylabel("Average Temperature in °C")
     
 
 
@@ -137,22 +137,22 @@ def show_trends(i):
 #    lon,lat,tas,time = extract(filename=filenames[i])
 #    year, year_numbers, tases, time2 = extract_years(time,tas)
 #    show_trends(year_numbers,tases,lat,name=names[i])
-def show_interactive_trends():
-    fig = plt.figure(figsize=(10,5))
-    ax = plt.subplot(1,1,1)
-    show_trends(0)
+#def show_interactive_trends():
+    
+show_trends(0)
 
-    color_radios_ax = fig.add_axes([0.9, 0.5, 0.2, 0.15])
-    color_radios = RadioButtons(color_radios_ax, ("rcp26","rcp45","rcp60","rcp85"), active=0)
-    def color_radios_on_clicked(label):
-        i = names.index(label)
-        show_trends(i)
-    color_radios.on_clicked(color_radios_on_clicked)
-    plt.show()
-
-
+color_radios_ax = fig_trend.add_axes([0.9, 0.5, 0.2, 0.15])
+color_radios_trend = RadioButtons(color_radios_ax, ("rcp26","rcp45","rcp60","rcp85"), active=0)
+def color_radios_on_clicked(label):
+    i = names.index(label)
+    show_trends(i)
+color_radios_trend.on_clicked(color_radios_on_clicked)
 #plt.show()
-tases = tases - tases[None,0]
+#plt.show()
+
+#show_interactive_trends()
+#plt.show()
+#tases = tases - tases[None,0]
 mask = lon >= 180
 #print(mask)
 lon[mask] -= 360
@@ -162,9 +162,10 @@ arr1inds = lon.argsort()
 lon = lon[arr1inds]
 
 #ax.set_global()
-tas = tas[:,:,arr1inds]
 lon = np.concatenate((lon,np.array([180.])))
-tas = np.concatenate((tas,tas[:,:,0,None]),axis=-1)
+for j in range(len(tas_s)):
+    tas_s[i] = tas_s[i][:,:,arr1inds]
+    tas_s[i] = np.concatenate((tas_s[i],tas_s[i][:,:,0,None]),axis=-1)
 #print(lon)
 lo, la = np.meshgrid(lon, lat)
 #print(lo, la, tas[0])
@@ -188,37 +189,48 @@ ax = plt.subplot(1,1,1)
 #assert 0
 #levels = np.percentile(value[mask], np.linspace(0,100,101))
 #norm = matplotlib.colors.BoundaryNorm(levels,256)
-max_tas = max(abs(tases.min()),abs(tases.max()))
+#max_tas = max(abs(tases.min()),abs(tases.max()))
 #norm = matplotlib.colors.Normalize(-max_tas,max_tas)
-norm = matplotlib.colors.Normalize(tases.min(),tases.max())
+norm = matplotlib.colors.Normalize((np.array(tases_s)-tases_s[0]).min(),(np.array(tases_s)-tases_s[0]).max())
 
+#print((np.array(tases_s)-tases_s[0]).min(),(np.array(tases_s)-tases_s[0]).max())
+#assert 0
 ax.set_aspect('equal')
 #ax.set_title(f"{title}")
 world.plot(ax=ax, color='lightblue', edgecolor='black')
+freq_slider_ax = fig.add_axes([0.85, 0.3, 0.03, 0.65])#, axisbg=axis_color)
+freq_slider = Slider(freq_slider_ax, 'Jahr', 0, 95.0, valinit=0,orientation="vertical")
+
+color_radios_ax = fig.add_axes([0.9, 0.5, 0.2, 0.15])
+color_radios = RadioButtons(color_radios_ax, ("rcp26","rcp45","rcp60","rcp85"), active=0)
 
 #layer = ax.pcolormesh(lo, la, tas[0], transform=ccrs.PlateCarree(), cmap="plasma")
 layer = ax.pcolormesh(lo, la, tas[0]*np.nan, cmap="plasma",norm=norm,alpha = 0.5)
-cbar = fig.colorbar(layer,norm=norm, orientation="horizontal")
-cbar.set_label("Temperature (K)")
+cbar = fig.colorbar(layer,norm=norm, ax=ax, orientation="horizontal")
+cbar.set_label("Änderung in Temperatur in °C seit 2006")
 ax.set_title(time2[0])
 # ax.gridlines()
 #ax.coastlines()
 #plt.show()
-ave_temp = np.average(tases[:,:,:],weights=weights,axis=(1,2))
-
+selected_year = 0
+selected_model = 0
 def animate(i):
+    global selected_year
+    selected_year = i
     #plt.figure()
     #ax = plt.subplot(1,1,1)
     #layer = ax.pcolormesh(lo, la, tas[i], cmap="plasma",alpha = 0.5)
     ax.clear()
     world.plot(ax=ax, color='lightblue', edgecolor='black')
 
-    plt.pcolormesh(lo, la, tases[i], norm=norm,cmap="plasma",alpha = 0.5)
-
+    ax.pcolormesh(lo, la, tases_s[selected_model][i]-tases_s[selected_model][0], norm=norm,cmap="plasma",alpha = 0.5)
+    print(selected_model,i)
     #norm = matplotlib.colors.Normalize(vmin=cm.min,vmax=cm.max)
     #plt.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap="plasma"), ax=ax)
     #cbar = fig.colorbar(layer, orientation="horizontal")
-    ax.set_title(f"Jahr {year_numbers[i]}, Globale Temp: {ave_temp[i]:.2f} und in Heidelberg {tases[i,110,4]:.2f}")
+    ave_temp = np.average(tases_s[selected_model][i],weights=weights[i])
+
+    ax.set_title(f"{names[selected_model]} Jahr {year_numbers[i]}, Globale Temp: {ave_temp:.2f} °C und in Heidelberg {tases_s[selected_model][i,110,4]:.2f} °C")
     #print(tases.shape,year_numbers.shape)
 
     print(tas[i])
@@ -226,9 +238,36 @@ def animate(i):
     return layer,
 #ax.pcolormesh(lo, la, tas[50], cmap="plasma",alpha = 0.5)
 #layer.set_array(tas[20])
-import matplotlib.animation as animation
-anim = animation.FuncAnimation(fig, animate,
-                               frames=200, interval=20, blit=True)
+#import matplotlib.animation as animation
+#anim = animation.FuncAnimation(fig, animate,
+#                               frames=200, interval=20, blit=True)
+
+
+
+# Define an action for modifying the line when any slider's value changes
+def sliders_on_changed(val):
+    print(val)
+    val = int(val)
+    #line.set_ydata(signal(amp_slider.val, freq_slider.val))
+    #fig.canvas.draw_idle()
+    animate(val)
+freq_slider.on_changed(sliders_on_changed)
+
+def change_map_year(i):
+    global selected_model
+    selected_model = i
+    animate(selected_year)
+    #norm = matplotlib.colors.Normalize(vmin=cm.min,vmax=cm.max)
+    #plt.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap="plasma"), ax=ax)
+    #cbar = fig.colorbar(layer, orientation="horizontal")
+
+
+def color_radios_on_clicked_map(label):
+    i = names.index(label)
+    change_map_year(i)
+
+color_radios.on_clicked(color_radios_on_clicked_map)
+plt.show()
 
 plt.show()
 #anim.save('sine_wave.gif', writer='ffmpeg')
