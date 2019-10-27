@@ -97,6 +97,6 @@ ggplot(plotTab, aes(x=x,y=y)) + geom_point(shape =21, fill = plotTab$col, alpha 
 
 # Save data for shinyApps
 ```{r}
-save(co2Data, co2Today, heatwave_days, file = "../shinyApp/data.RData")
+save(co2Data, co2Today, heatDay, file = "../shinyApp/data.RData")
 ```
 
