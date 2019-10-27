@@ -9,13 +9,14 @@
     <title>CO2</title>
     <!-- Style -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 </head>
 
 <div id="mapid" style="width: 99%; position:absolute; top:0;bottom:0;"></div>
-<button style="position:absolute; z-Index:99999;bottom:50px;left:55%;width:200px;height:100px" id="calc" onclick="getData()">Calculate route!
+<button style="position:absolute; z-Index:99999;bottom:50px;left:55%;width:200px;height:100px"  class="btn btn-secondary btn-lg" id="calc" onclick="getData()">Calculate route!
 </button>
-<button id="reset" style="position:absolute; z-Index:999;bottom:50px;left:35%;width:200px;height:100px" onclick="resetMarker()">Reset start position
+<button id="reset" class="btn btn-secondary btn-lg" style=";position:absolute; z-Index:999;bottom:50px;left:35%;width:200px;height:100px" onclick="resetMarker()">Reset start position
 </button>
 
 <!-- JavaScript -->
@@ -24,7 +25,11 @@
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
 <script>
-    var map = L.map('mapid').setView([49.41, 8.681495], 13);
+    var map = L.map('mapid').setView([49.41, 8.681495], 13)
+    map.setMaxBounds([
+		[49.3, 8.3],
+		[49.6, 8.9]
+	]);
 
     var marker = L.marker([49.419296, 8.675724]).addTo(map);
 
@@ -66,11 +71,11 @@
         var co2_bus = route_length * 0.063 / 1000; // source: https://www.delijn.be/de/overdelijn/organisatie/zorgzaam-ondernemen/milieu/co2-uitstoot-voertuigen.html
         var amount = (co2_car - co2_bus).toFixed(3);;
         var statement = route_length < 3000 ? "a little" : "a lot";
-        var statement2 = statement == "a little" ? "What about using your bike? CO2 Emission free!" : "Going by Bus could save " + amount + "kg CO2 emissions!";
+        var statement2 = statement == "a little" ? "What about using your bike? <br> <font color='green'>CO2 Emission free!</font>" : "Going by Bus could save <font color='red'>" + amount + " kg </font> CO2 emissions!";
         calculated_route = geoObject.features[0];
         route_layer = L.geoJSON().addTo(map);
         route_layer.addData(calculated_route);
-        new_event_marker.bindPopup("This ride would be contributing " + statement + " to climate change!<br>" + statement2).openPopup();
+        new_event_marker.bindPopup("<center><font size=4>This ride would be contributing " + statement + " to climate change!<br>" + statement2 + "</font></center>").openPopup();
     }
 
     map.on('click', function(e) {
