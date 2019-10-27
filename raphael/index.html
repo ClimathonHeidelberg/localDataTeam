@@ -23,9 +23,9 @@
     <div id="mapid" style="width: 99%; position:absolute; top:0;bottom:0;"></div>
 
     <div class="container-fluid" style="margin: 0 auto; text-align: center;position:absolute;z-Index:999;bottom:50px">
-        <button id="reset" class="btn btn-secondary btn-lg" style="width:200px;height:100px" onclick="resetMarker()">Reset start position
+        <button id="reset" class="btn btn-secondary btn-lg" style="width:200px;height:100px" onclick="resetMarker()">Startposition ändern
         </button>
-        <button style="width:200px;height:100px"  class="btn btn-secondary btn-lg" id="calc" onclick="getData()">Calculate route!
+        <button style="width:200px;height:100px"  class="btn btn-secondary btn-lg" id="calc" onclick="getData()">Route berechnen!
         </button>
     </div>
 </div>
@@ -80,12 +80,12 @@
         var co2_car = route_length * 0.143 / 1000; // source: https://www.delijn.be/de/overdelijn/organisatie/zorgzaam-ondernemen/milieu/co2-uitstoot-voertuigen.html
         var co2_bus = route_length * 0.063 / 1000; // source: https://www.delijn.be/de/overdelijn/organisatie/zorgzaam-ondernemen/milieu/co2-uitstoot-voertuigen.html
         var amount = (co2_car - co2_bus).toFixed(3);;
-        var statement = route_length < 3000 ? "a little" : "a lot";
-        var statement2 = statement == "a little" ? "What about using your bike? <br> <font color='green'>CO2 Emission free!</font>" : "Going by Bus could save <font color='red'>" + amount + " kg </font> CO2 emissions!";
+        var statement = route_length < 3000 ? "ein bisschen" : "ziemlich";
+        var statement2 = statement == "ein bisschen" ? "Fahre das doch mit dem Rad. <br> <font color='green'>CO2 emissionsfrei!</font>" : "Mit dem Bus könnten <font color='red'>" + amount + " kg </font> CO2 Emissionen eingespart werden!";
         calculated_route = geoObject.features[0];
         route_layer = L.geoJSON().addTo(map);
         route_layer.addData(calculated_route);
-        new_event_marker.bindPopup("<center><font size=4>This ride would be contributing " + statement + " to climate change!<br>" + statement2 + "</font></center>").openPopup();
+        new_event_marker.bindPopup("<center><font size=4>Diese Fahrt würde  " + statement + " zum Klimawandel beitragen!<br>" + statement2 + "</font></center>").openPopup();
     }
 
     map.on('click', function(e) {
