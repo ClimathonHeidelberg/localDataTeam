@@ -42,7 +42,7 @@ co2Data <- lapply(seq(1, ncol(dataTab), by =3), function(i) {
 
 ```{r}
 yearRange <- c(0, 200000, 400000, 600000, 800000)
-ggplot(fullData, aes(x=year, y=CO2)) + geom_point() + geom_line() +
+ggplot(co2Data, aes(x=year, y=CO2)) + geom_point() + geom_line() +
   scale_x_reverse(breaks = yearRange, labels = c("heute","vor\n200.000\nJahren","vor\n400.000\nJahren","vor\n 600.000\nJahren","vor\n800.000\nJahren")) + ylab("CO2-Konzentration") + xlab("") +
   theme_bw()
 ```
@@ -56,14 +56,47 @@ co2Today <- read_xlsx("../Datasets/annual_co2_data_ppm_hawaii.xlsx") %>%
   select(year, CO2)
 ```
 
-# Temperature
+# Temperature (heat wave days)
 ```{r}
-tempTab <- read_csv("../Datasets/temperature.csv")
-ggplot(tempTab, aes(x=year, y = temperature)) + geom_point()+ geom_smooth()
+max_temperature_data_mannheim <- read.csv("../Datasets/temperature.csv")
+
+#select days with minimum 33 degrees
+max_temp_data_filtered <- max_temperature_data_mannheim %>% 
+  subset(temperature > 33) 
+
+max_temp_data_filtered$year <- 
+  max_temp_data_filtered$year %>% 
+  as.character()
+
+years <- c(1937:2018) %>%
+  as.character()
+  
+heatwave_days <- c()
+
+for (i in years){
+  no_heat_days <- grepl(i, max_temp_data_filtered$year) %>%
+    sum()
+  names(no_heat_days) <- i
+  heatwave_days <- c(heatwave_days, no_heat_days)
+}
+heatDay <- tibble(year = names(heatwave_days), days = heatwave_days)
+```
+
+Prototype plot
+```{r}
+i <- 2015
+colList <- colorRampPalette(c("green","yellow","red"))(length(unique(heatDay$days)))
+names(colList) <- sort(unique(heatDay$days))
+plotTab <- filter(heatDay, year == i) %>% 
+  mutate(x=1, y=1, col = colList[as.character(days)])
+
+ggplot(plotTab, aes(x=x,y=y)) + geom_point(shape =21, fill = plotTab$col, alpha =0.8, size = plotTab$days+5) +
+  geom_text(aes(label = days), face = "bold") +
+  theme_void()
 ```
 
 # Save data for shinyApps
 ```{r}
-save(co2Data, co2Today, file = "../shinyApp/data.RData")
+save(co2Data, co2Today, heatwave_days, file = "../shinyApp/data.RData")
 ```
 

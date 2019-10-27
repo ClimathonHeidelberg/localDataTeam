@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import geopandas
+import pandas as pd
+
 
 
 f1 = netcdf.netcdf_file("tas_Amon_IPSL-CM5A-MR_rcp45_r1i1p1_200601-210012.nc")
@@ -13,6 +15,12 @@ lat = np.array(f1.variables['lat'][:])
 tas = np.array(f1.variables['tas'][:])-273
 time = np.array(f1.variables['time'][:])
 
+#df = pd.DataFrame({'time': time, 'tas':tas})
+#print(df)
+#tempf = pd.DataFrame(tas)
+#df = df.append(tempf)
+#print(1)
+#assert 0
 print(time.shape,tas.shape,lon.shape,lat.shape)
 #
 
@@ -44,7 +52,20 @@ year = np.array(time,dtype=datetime.date)
 print(time2)
 for i in range(len(time)):
     time2[i] = serial_date_to_date(time[i])
-    year[i] = int(str(time2[0])[:4])
+    year[i] = int(str(time2[i])[:4])
+
+year_numbers = np.unique(year)
+print(year)
+print(year_numbers)
+tas_list = []
+for year_numb in year_numbers:
+    mask = (year == year_numb)
+    print("number of same years",np.sum(mask))
+    year_tas = np.average(tas[mask,:,:],axis=0)
+    tas_list.append(year_tas)
+    #print(year_numb,year_tas)
+tases = np.array(tas_list)
+print(tases.shape,year_numbers.shape)
 print(time2[0])
 print(int(str(time2[0])[:4]))
 #assert 0
@@ -58,7 +79,7 @@ print(year)
 #assert 0
 plt.figure()
 
-plt.plot(time,tas[:,110,4]-273)
+plt.plot(year_numbers,tases[:,110,4])
 #plt.show(block=True)
 
 weights = np.cos(np.deg2rad(lat))
@@ -93,7 +114,7 @@ print(lo.shape, la.shape, tas.shape)
 
 
 
-fig = plt.figure(figsize=(11,7))
+fig = plt.figure(figsize=(10,6))
 #ax = fig.add_subplot(1,1,1, projection=ccrs.Robinson())
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 ax = plt.subplot(1,1,1)
@@ -102,15 +123,17 @@ ax = plt.subplot(1,1,1)
 
 
 #assert 0
-
+#levels = np.percentile(value[mask], np.linspace(0,100,101))
+#norm = matplotlib.colors.BoundaryNorm(levels,256)
+norm = matplotlib.colors.Normalize(tases.min(),tases.max())
 
 ax.set_aspect('equal')
 #ax.set_title(f"{title}")
 world.plot(ax=ax, color='lightblue', edgecolor='black')
 
 #layer = ax.pcolormesh(lo, la, tas[0], transform=ccrs.PlateCarree(), cmap="plasma")
-layer = ax.pcolormesh(lo, la, tas[0]*np.nan, cmap="plasma",alpha = 0.5)
-cbar = fig.colorbar(layer, orientation="horizontal")
+layer = ax.pcolormesh(lo, la, tas[0]*np.nan, cmap="plasma",norm=norm,alpha = 0.5)
+cbar = fig.colorbar(layer,norm=norm, orientation="horizontal")
 cbar.set_label("Temperature (K)")
 ax.set_title(time2[0])
 # ax.gridlines()
@@ -121,13 +144,17 @@ def animate(i):
     #plt.figure()
     #ax = plt.subplot(1,1,1)
     #layer = ax.pcolormesh(lo, la, tas[i], cmap="plasma",alpha = 0.5)
+    ax.clear()
     world.plot(ax=ax, color='lightblue', edgecolor='black')
 
-    plt.pcolormesh(lo, la, tas[i], cmap="plasma",alpha = 0.5)
+    plt.pcolormesh(lo, la, tases[i], cmap="plasma",alpha = 0.5)
+    
     #norm = matplotlib.colors.Normalize(vmin=cm.min,vmax=cm.max)
     #plt.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap="plasma"), ax=ax)
     #cbar = fig.colorbar(layer, orientation="horizontal")
-    ax.set_title(time2[i])
+    ax.set_title(year_numbers[i])
+    #print(tases.shape,year_numbers.shape)
+
     print(tas[i])
     #layer.set_array(tas[i].ravel())
     return layer,
