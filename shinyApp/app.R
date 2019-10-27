@@ -15,12 +15,17 @@ load("./data.RData")
 ui <- fluidPage(
    
    # Application title
-   titlePanel("CO2-Konzentration in der Atmosphäre"),
+   titlePanel(h1("Klima zum Anfassen", align = "center",
+                 style = "font-family: 'Chalkduster', bold;
+                 font-weight: 600; line-height: 2; 
+                 color: #4d3a7d;")),
+   hr(style="border-color: #4d3a7d;"),
    plotOutput("co2History", height = 300),
    column(4, plotOutput("heatDays", height = 200)),
    column(8, plotOutput("recentCO2", height = 250),
           sliderInput("year", "Ziehen Sie den Knopf, um ein Jahr zu wählen!", value = 1960,min = 1960, 
-                      max=2018, step=1, width =1000, sep=""))
+                      max=2018, step=1, width =1000, sep=""),
+          img(src='./qr-code-software.png', align = "right", width=100, height=100))
 )
 
 # Define server logic required to draw a histogram
@@ -31,10 +36,11 @@ server <- function(input, output) {
      ggplot(co2Data, aes(x=year, y=CO2)) + geom_smooth(method = "loess", span=0.005, se=FALSE, col = "darkgreen", size =3) +
        scale_x_reverse(breaks = yearRange, labels = c("heute","vor\n200.000\nJahren","vor\n400.000\nJahren","vor\n 600.000\nJahren","vor\n800.000\nJahren")) +
        geom_rect(xmin = -6000, xmax = 1000, ymin = 160, ymax =390, col ="red", fill = NA, linetype = "dashed") +
-       ylab("CO2-Konzentration") + xlab("") + ylim(150,400) +
+       ylab("CO2-Konzentration") + xlab("") + ylim(150,400) + ggtitle("CO2-Konzentration in der Atmosphäre") +
        theme_bw() + theme(axis.text.x = element_text(size=20, face = "bold"), 
                           axis.text.y = element_text(size=15), 
-                          axis.title = element_text(size=20))
+                          axis.title = element_text(size=20),
+                          plot.title = element_text(size=20, color = "darkred", hjust=0.5))
    })
    
    output$recentCO2 <- renderPlot({
