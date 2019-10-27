@@ -11,14 +11,24 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+    <!-- Future work:
+        - Add public transportation data, so a user can actually get an alternative
+        - Format marker and line color according to CO2 emission (green: ok, yellow: not so good, red: bad)
+        - Provide a form so people can actually select with what they are traveling (at the moment, it is a car)
+        - Add different vehicles
+    -->
 </head>
 
-<div id="mapid" style="width: 99%; position:absolute; top:0;bottom:0;"></div>
-<button style="position:absolute; z-Index:99999;bottom:50px;left:55%;width:200px;height:100px"  class="btn btn-secondary btn-lg" id="calc" onclick="getData()">Calculate route!
-</button>
-<button id="reset" class="btn btn-secondary btn-lg" style=";position:absolute; z-Index:999;bottom:50px;left:35%;width:200px;height:100px" onclick="resetMarker()">Reset start position
-</button>
+<div>
+    <div id="mapid" style="width: 99%; position:absolute; top:0;bottom:0;"></div>
 
+    <div class="container-fluid" style="margin: 0 auto; text-align: center;position:absolute;z-Index:999;bottom:50px">
+        <button id="reset" class="btn btn-secondary btn-lg" style="width:200px;height:100px" onclick="resetMarker()">Reset start position
+        </button>
+        <button style="width:200px;height:100px"  class="btn btn-secondary btn-lg" id="calc" onclick="getData()">Calculate route!
+        </button>
+    </div>
+</div>
 <!-- JavaScript -->
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
