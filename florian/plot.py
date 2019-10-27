@@ -11,7 +11,7 @@ import numpy.polynomial.polynomial as poly
 
 
 filenames = ["tas_Amon_IPSL-CM5A-MR_rcp26_r1i1p1_200601-210012.nc","tas_Amon_IPSL-CM5A-MR_rcp45_r1i1p1_200601-210012.nc","d401c16d-f083-415d-8f53-d6a017cc9cd2-tas_Amon_IPSL-CM5A-MR_rcp60_r1i1p1_200601-210012.nc","tas_Amon_IPSL-CM5A-MR_rcp85_r1i1p1_200601-210012.nc"]
-names = ["rcp26","rcp45","rcp60","rcp85"]
+names = ["Emit 2.6","Emit 4.5","Emit 6.0","Emit 8.5"]
 
 def extract(filename=filenames[1]):
     f1 = netcdf.netcdf_file(filename)
@@ -142,7 +142,7 @@ def show_trends(i):
 show_trends(0)
 
 color_radios_ax = fig_trend.add_axes([0.9, 0.5, 0.2, 0.15])
-color_radios_trend = RadioButtons(color_radios_ax, ("rcp26","rcp45","rcp60","rcp85"), active=0)
+color_radios_trend = RadioButtons(color_radios_ax, ("Emit 2.6","Emit 4.5","Emit 6.0","Emit 8.5"), active=0)
 def color_radios_on_clicked(label):
     i = names.index(label)
     show_trends(i)
@@ -199,10 +199,10 @@ ax.set_aspect('equal')
 #ax.set_title(f"{title}")
 world.plot(ax=ax, color='lightblue', edgecolor='black')
 freq_slider_ax = fig.add_axes([0.85, 0.3, 0.03, 0.65])#, axisbg=axis_color)
-freq_slider = Slider(freq_slider_ax, 'Jahr', 0, 95.0, valinit=0,orientation="vertical")
+freq_slider = Slider(freq_slider_ax, 'Jahr', 2006, 2100, valstep=1, valinit=0,orientation="vertical")
 
 color_radios_ax = fig.add_axes([0.9, 0.5, 0.2, 0.15])
-color_radios = RadioButtons(color_radios_ax, ("rcp26","rcp45","rcp60","rcp85"), active=0)
+color_radios = RadioButtons(color_radios_ax, ("Emit 2.6","Emit 4.5","Emit 6.0","Emit 8.5"), active=0)
 
 #layer = ax.pcolormesh(lo, la, tas[0], transform=ccrs.PlateCarree(), cmap="plasma")
 layer = ax.pcolormesh(lo, la, tas[0]*np.nan, cmap="plasma",norm=norm,alpha = 0.5)
@@ -247,6 +247,7 @@ def animate(i):
 # Define an action for modifying the line when any slider's value changes
 def sliders_on_changed(val):
     print(val)
+    val = val - 2006
     val = int(val)
     #line.set_ydata(signal(amp_slider.val, freq_slider.val))
     #fig.canvas.draw_idle()
