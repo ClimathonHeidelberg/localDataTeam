@@ -40,6 +40,7 @@
 
 <script>
     var map = L.map('mapid', {zoomControl: false}).setView([49.41, 8.681495], 13)
+    var api_key = ""; // get an API-key at https://openrouteservice.org and put it here :)
     map.setMaxBounds([
 		[49.3, 8.3],
 		[49.6, 8.9]
@@ -76,7 +77,7 @@
         var lat = new_event_marker._latlng.lat;
         var lng = new_event_marker._latlng.lng;
 
-        var url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf624866cc48fc26c14cf48ecb30e7c1c5ebf5&start=" + marker._latlng.lng + "," + marker._latlng.lat + "&end=" + lng + "," + lat;
+        var url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key + "&start=" + marker._latlng.lng + "," + marker._latlng.lat + "&end=" + lng + "," + lat;
         var xmlHttp = new XMLHttpRequest();
 
         xmlHttp.open("GET", url, false);
